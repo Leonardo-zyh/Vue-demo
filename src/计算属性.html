@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>计算属性</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17-beta.0/vue.min.js"></script>
+
+</head>
+
+<body>
+    <div id="app">
+        {{price}}    <br>
+        {{reverseText}}
+    </div>
+
+
+    <script>
+        //123,456,789=>789,456,123  text.split().reverse().join(',')
+        var app = new Vue({
+            el: '#app',     //实例挂载DOM中
+            data: {         //双向绑定数据
+                text:'123,456,789',
+                package1:[
+                    {name:'iphone8',price:4200,count:1},
+                    {name:'iphoneX',price:8200,count:2},
+                ],
+                package2:[
+                    {name:'ipad',price:4100,count:1},
+                    {name:'ipad-pen',price:620,count:2},
+                ]
+            },
+            computed:{//如果直接跟function，getter函数
+                reverseText:function(){
+                    return this.text.split(',').reverse().join(',')
+                },
+                price:function(){
+                    let prices = 0
+                    for(let i=0;i<this.package1.length;i++){
+                        prices +=this.package1[i].price*this.package1[i].count
+                    }
+                    for(let j=0;j<this.package2.length;j++){
+                        prices +=this.package1[j].price*this.package1[j].count
+                    }
+                    return prices
+                }
+
+            }
+            
+        })
+
+        
+        
+    </script>
+</body>
+
+</html>

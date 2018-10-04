@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内置命令</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17-beta.0/vue.min.js"></script>
+    <style>
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <p v-cloak>{{msg}}</p>
+        <p v-if="1>2">{{apple}}</p>
+        <p v-else-if="8>0">{{banana}} </p>
+        <p v-else>{{msg}} </p>
+        <p v-show="0">v-show</p>
+        <div v-if="name">
+            name: <input type="text" placeholder="name" key="name">
+        </div>
+        
+        <div v-else>
+                psd: <input type="text" placeholder="psd" key="psd">
+            </div>
+        <button @click="toggleType">切换</button>
+        <ul>
+            <li v-for="item in list">{{item}} </li>
+            <li v-for="(value,key,index) of lest" :key="index">{{index}} - {{value}} - {{key}} </li>
+        </ul>
+        <div >{{matchoo}}  {{count}}</div>
+        <div @click.self='div'>
+                <button @click="handel()">点击加1</button>
+                ------------------------------------------
+                <button @click="handel(6)">点击加8</button>
+        </div>        
+        
+    </div>
+    
+    
+    <script>
+        var app = new Vue({
+            el: '#app',     //实例挂载DOM中
+            data: {         //双向绑定数据
+                msg:666,
+                isActive: false,
+                apple:'red',
+                banana:'yellow',
+                show:0,
+                name:'type',
+                arr:['book','ipone','ipad'],
+                list:['1','2','3','4','5','6','7','8','9'],
+                lest:{'A':'a','B':'b','C':'c','D':'d','E':'e'},
+                count:0,
+            },
+            computed: {
+                matchoo:function(){
+                    return this.arr.filter((book)=>{//必须是数组字符串
+                        return book.match(/oo/);
+                    })
+                }
+            },
+            methods: {      //事件名和数据变量名会冲突
+                toggleType:function(){
+                    this.name=!this.name
+                },
+                handel:function(count){
+                    count=count || 1
+                    this.msg += count
+                },
+                div:function(){
+                    alert(1)
+                }
+
+            }
+        })
+
+
+
+    </script>
+</body>
+
+</html>
