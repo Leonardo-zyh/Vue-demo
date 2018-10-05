@@ -175,10 +175,32 @@ vueJS为我们提供了：
 
 
 
+#表单与v-­model         用于在表单类元素上双向绑定事件
+可以用于input框，以及textarea等
+注意： 所显示的值只依赖于所绑定的数据，不再关心初始化时的插入的value
 
+#单选按钮
+单选按钮，直接用`v­-bind`绑定一个布尔值，不可以用v­-model
+多个单选框组合使用，就需要`v­-model`来配合value使用，绑定选中的单选框的value值
+#复选框
+单个复选框，直接用定一个布尔值，可以用`v­-model`可以用`v­-bind`
+多个复选框 ，需要`v­-model`来配合value使用，v-­model绑定一个数组,
+如果绑定的是字符串，会转化为true、false，与所有绑定的复选框的checked属性相对应
+#下拉框
+如果是单选，所绑定的value值初始化可以为数组或字符串，有value直接优先匹配一个value值，没有value就匹配一个text值
+如果是多选，就需要v­-model来配合value使用，v­-model绑定一个数组，与复选框类似
+v­-model一定是绑定在select标签上
+#总结一下：如果是单选，初始化最好给定字符串，因为v­-model此时绑定的是静态字符串或者布尔值
 
+#绑定值
+单选按钮：  只需要用v­bind给单个单选框绑定一个value值，此时，v­model绑定的就是他的value值
+复选框、下拉框：    在select标签上绑定value值对option并没有影响
+<input type="checkbox" v-model="toggle" :true-value="value1" :false-value="value2">
 
-
+#修饰符
+lazy        v-­model默认是在input输入时实时同步输入框的数据，而lazy修饰符，可以使其在失去焦点或者敲回车键之后在更新
+number      将输入 的字符串转化为number类型
+triz        trim自动过滤输入过程中收尾输入的空格
 
 
 
@@ -186,13 +208,154 @@ vueJS为我们提供了：
 
 
 #Vue组件   (每一个组件都是Vue的实例)
-#全局组件
+#使用组件的原因
+作用：提高代码的复用性
+
+#全局注册
 Vue.component('todo-item',{templet:'<li>item</li>'})
 <todo-item></todo-item>
-#局部组件
-let TodoItem = {template:'<li>item</li>'}
-components:{'todo-item':TodoItem}
+优点：所有的nue实例都可以用
+缺点：权限太大，容错率降低
+
+#局部注册
+components:{'todo-item':{template:'<li>item</li>'}
+<todo-item></todo-item>
+
+#限制
+`table中使用组件无效需使用is属性。<table is="todo-item"></tbody>`
+
+
+#组件使用的奇淫技巧
+1. 推荐使用小写字母加­进行命名（必须） child, my-­componnet命名组件
+
+2. template中的内容必须被一个DOM元素包括 ，也可以嵌套。
+
+3. 在组件的定义中，除了template之外的其他选项 — data,computed,methods
+
+4. data必须是一个方法
+
+
+
 #组件传递参数
-Vue.component('todo-item',{
-    `props:['content']`
-    templet:'<li>{{content}}</li>'})
+`使用props传递数据 父组件向子组件传递数据`
+1. 在组件中使用props来从父亲组件接收参数，注意:在props中定义的属性，可以在组件中直接使用
+
+2. props来自父级，而组件中data return的数据就是组件自己的数据，两种情况作用域就是组件本身，可以在template，computed，methods中直接使用
+
+3. props的值有两种，一种是字符串数组，一种是对象，本节先只讲数组
+
+4. 可以使用v-­bind动态绑定父组件来的内容。
+~~~
+    <todo-item content="Vue的组件"></todo-item>
+
+    Vue.component('todo-item',{
+        props:['content']
+        templet:'<li>{{content}}</li>'})
+~~~
+
+#单向数据流
+通过` props 传递数据` 是单向的了， 也就是父组件数据变化时会传递给子组件，但是反过来不行。
+目的是尽可能将父子组件解稿，避免子组件无意中修改了父组件的状态。
+业务场景：业务中会经常遇到两种需要改变 prop 的情况
+
+# 一种是父组件传递初始值进来，子组件将它作为初始值保存起来，
+在自己的作用域下可以随意使用和修改。这种情况可以在组件 data 内再声明一个数据，引用父组件的 prop
+步骤一：注册组件
+步骤二：将父组件的数据传递进来，并在子组件中用props接收
+步骤三：将传递进来的数据通过初始值保存起来
+
+~~~
+    <my-comp init-count="666"></my-comp>
+
+    var app = new Vue({
+            el:'#app',
+            components:{
+                'my-comp':{
+                    props:['init-count'],
+                    template:'<div>{{init-count}}</div>',
+                    data:function () {
+                        return{
+                            count:this.initCount
+        }}}}})
+~~~
+
+
+
+# 另一种情况就是 prop 作为需要被转变的原始值传入。这种情况用计算属性就可以了
+步骤一：注册组件
+步骤二：将父组件的数据传递进来，并在子组件中用props接收
+步骤三：将传递进来的数据通过计算属性进行重新计算
+
+~~~
+    <my-component :width="width"></my-component>
+    
+    Vue.component('my-component', {
+            props: ['width'],
+            template: '<div :style="style">Vue的全局组件</div>',
+            computed: {
+                style: function () {
+                    return {
+                        width: this.width + 'px',
+                        background: 'red'
+                    }
+                }
+            }
+        })
+~~~
+
+
+#数据验证   (html中不驼峰,传递数据短横线,template中驼峰,data中驼峰)
+@ vue组件中camelCased (驼峰式) 命名与 kebab­case（短横线命名）
+
+* @ 在html中, myMessage 和 mymessage 是一致的,
+    因此在组件中的html中使用必须使用kebab­case（短横线）命名方式。`在html中不允许使用驼峰`！！！！！！
+
+* @ 在`组件中, 父组件给子组件传递数据必须用短横线`。
+    `在template中，必须使用驼峰命名方式`，若为短横线的命名方式。则会直接保错。
+
+* @ `在组件的data中,用this.XXX引用时,只能是驼峰命名`方式。
+    若为短横线的命名方式，则会报错。
+
+
+
+
+#验证的type 
+* 类型可以是：String 、  Number 、 Boolean 、  Object 、  Array 、  Function
+
+~~~
+    Vue.component （ 'my-compopent'， ｛
+        props : {
+                    ／／必须是数字类型
+            propA : Number ,
+
+                    ／／必须是字符串或数字类型
+            propB : [String , Number] ,
+
+                    ／／布尔值，如果没有定义，默认值就是 true
+            propC: {
+                type : Boolean ,
+                default : true
+            },
+
+                    ／／数字，而且是必传
+            propD: {
+                type: Number ,
+                required : true
+            },
+                    ／／如果是数组或对象，默认值必须是一个函数来返回
+            propE: {
+                type : Array ,
+                default : function () {
+                return [] ;
+                }
+            },
+                    ／／自定义一个验证函数
+            propF: {
+                validator : function (value) {
+                return value > 10;
+        }}}});
+~~~
+
+
+# 组件通信
+组件关系可分为父子组件通信、兄弟组件通信、跨级组件通信

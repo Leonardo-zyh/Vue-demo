@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17-beta.0/vue.min.js"></script>
+    <style>
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <hr>* 全局注册,局部注册
+        <my-component :msg="msg" :width="width"></my-component>
+        <app-component msg="Vue"></app-component>
+
+        <hr>* 使用v-bind动态绑定
+        <input type="text" v-model="width">
+        <bind-component :bindmsg="bindmsg"></bind-component>
+        <app-component-two></app-component-two>
+        <btn-component></btn-component>
+    </div>
+
+
+    <script>
+        Vue.component('my-component', {
+            props: ['msg','width'],
+            template: '<div :style="style">{{msg}}的全局组件</div>',
+            computed: {
+                style: function () {
+                    return {
+                        width: this.width + 'px',
+                        background: 'red'
+                    }
+                }
+
+            }
+        })
+        var app = new Vue({
+            el: '#app',
+            components: {
+                'app-component': { props: ['msg'], template: '<div>{{msg}}的局部组件</div>' },
+                'app-component-two': { template: '<div>第二个Vue的局部组件</div>' },
+                //'btn-component':{props:['puls'],template:'<button @click="">{{count}} </button>'},
+                'bind-component': { props: ['bindmsg'], template: '<div>{{bindmsg}}</div>' },
+            },
+            data: {         //双向绑定数据
+                msg: 'Vue组件',
+                bindmsg: 'Vue组件的局部组件',
+                count: 0,
+                width:200,
+            },
+            computed: {
+
+            },
+            methods: {
+                puls: function () {
+                    this.count += 1
+                }
+            }
+        })
+
+
+
+    </script>
+</body>
+
+</html>
