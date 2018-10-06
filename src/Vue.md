@@ -359,3 +359,128 @@ components:{'todo-item':{template:'<li>item</li>'}
 
 # 组件通信
 组件关系可分为父子组件通信、兄弟组件通信、跨级组件通信
+自定义事件—子组件给父组件传递数据
+使用v­-on 除了监昕 DOM 事件外，还可以用于组件之间的自定义事件。
+`JavaScript 的设计模式` 一一观察者模式， dispatchEvent 和 addEventListener这两个方
+法。 Vue 组件也有与之类似的一套模式，
+子组件用`$emit()来 触发事件` ，父组件用`$on()来 监昕子组件的事件` 。
+
+第一步：自定义事件
+第二步： 在子组件中用$emit触发事件，第一个参数是事件名，后边的参数是要传递的数据
+第三步： 在父组件用v-on监听事件来接受参数，然后赋值到data数据中
+
+
+
+
+# 在组件中使用v­model
+`v-model可以代替父组件的监听，$emit触发input事件。`
+$emit的代码,这行代码实际上会触发一个 input事件, ‘input’后的参数就是传递给v­-model绑定的属性的值
+
+#v-­model 其实是一个语法糖，这背后其实做了两个操作
+* v­bind 绑定一个 value 属性
+* v-­on 指令给当前元素绑定 input 事件
+#要使用v­model,要做到:
+* 接收一个 value 属性。
+* 在有新的 value 时触发 input 事件
+~~~
+    <btn-compnent v-model="total"></btn-compnent>
+    data:{
+        total:0
+    },
+    this.$emit('input',this.count);
+~~~
+
+
+
+
+# 非父组件之间的通信
+* 父链：this.$parent
+* 子链：this.$refs      (提供了为子组件提供索引的方法，用特殊的属性ref为其增加一个索引)
+hods:{
+    getChildData:function () {     
+        //用来拿子组件中的内容 ---- $refs
+        this.formchild = this.$refs.c.msg;
+    }
+
+
+
+
+## 使用slot分发内容
+
+#编译的作用域
+在深入内容分发 API 之前，我们先明确内容在哪个作用域里编译。假定模板为：
+<child-component>
+{{ message }}
+</child-component>
+
+message 应该绑定到父组件的数据，还是绑定到子组件的数据？
+答案是`父组件`。组件作用域简单地说是：
+* 父组件模板的内容在父组件作用域内编译；
+* 子组件模板的内容在子组件作用域内编译。
+
+
+#什么是slot(插槽)
+为了让组件可以组合，我们需要一种方式来混合父组件的内容与子组件自己的模板。这个过
+程被称为 内容分发.Vue.js 实现了一个内容分发 API，使用特殊的 ‘slot’ 元素作为原始内容的
+插槽。
+
+
+#插槽的用法
+父组件的内容与子组件相混合，从而弥补了视图的不足
+混合父组件的内容与子组件自己的模板
+* 单个插槽：
+    <div id="app" >
+        <my-component>
+            <p>我是父组件的内容</p>
+        </my-component>
+    </div>
+
+        Vue.component('my-component',{
+            template:'<div>\
+                        <slot>\
+                        如果父组件没有插入内容，我就作为默认出现\
+                        </slot>\
+                    </div>'
+        })
+
+* 具名插槽：
+
+
+
+# 作用域插槽
+`作用域插槽是一种特殊的slot，使用一个可以复用的模板来替换已经渲染的元素 -- 从子组件获取数据`
+`template模板是不会被渲染的`
+
+~~~
+    Vue.component('my-component',{
+    template:'<div>\
+    <slot text="我是来自子组件的数据" ss="fdjkfjlsd" name="abc"
+    >\
+    </slot>\
+    </div>'
+    })
+~~~
+
+
+
+## 访问slot
+* 通过this.$slots.(NAME)
+~~~
+    mounted:function () {
+    //访问插槽
+    var header = this.$slots.header;
+    var text = header[0].elm.innerText;
+    var html = header[0].elm.innerHTML;
+    console.log(header)
+    console.log(text)
+    console.log(html)
+    }
+~~~
+
+
+
+# 组件高级用法–动态组件
+VUE给我们提供 了一个元素叫component
+* 作用是： 用来动态的挂载不同的组件
+* 实现：使用is特性来进行实现
+`<component :is="thisVuew"></component>`

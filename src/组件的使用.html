@@ -14,20 +14,32 @@
     <div id="app">
         <hr>* 全局注册,局部注册
         <my-component :msg="msg" :width="width"></my-component>
+
+        <solt-component>
+            <p slot="slot" slot-scope="prop">
+             
+                {{prop.text}}
+                {{prop.ss}}
+            </p>
+        </solt-component>
+
         <app-component msg="Vue"></app-component>
 
         <hr>* 使用v-bind动态绑定
         <input type="text" v-model="width">
         <bind-component :bindmsg="bindmsg"></bind-component>
         <app-component-two></app-component-two>
-        <btn-component></btn-component>
+        {{total}}
+        <btn-component @change="handleTotal"></btn-component>
+        <son-component v-model="total"></son-component>
     </div>
 
 
     <script>
         Vue.component('my-component', {
-            props: ['msg','width'],
-            template: '<div :style="style">{{msg}}的全局组件</div>',
+            props: ['msg', 'width'],
+            template: `<div :style="style"> {{msg}}的全局组件
+            </div>`,
             computed: {
                 style: function () {
                     return {
@@ -38,6 +50,21 @@
 
             }
         })
+        Vue.component('solt-component', {
+            template: `<div>\ 
+                <slot text="我是来自子组件的数据" ss="-- 作用域插槽" name="slot">\
+                </slot>\
+            </div>`,
+            mounted: function () {
+                var slot = this.$slots.slot;
+                
+
+            },
+            computed: {
+
+            }
+        })
+
         var app = new Vue({
             el: '#app',
             components: {
@@ -45,12 +72,36 @@
                 'app-component-two': { template: '<div>第二个Vue的局部组件</div>' },
                 //'btn-component':{props:['puls'],template:'<button @click="">{{count}} </button>'},
                 'bind-component': { props: ['bindmsg'], template: '<div>{{bindmsg}}</div>' },
+
+                'btn-component': {  //子组件通过$emit触发事件传递count
+                    template: `<div>
+                                    <button @click="handleincrease">+1000</button> 
+                                    <button @click="handlereduce">-1000</button>
+                                </div>`,
+                    data: function () {
+                        return {
+                            count: 0
+                        }
+                    },
+                    methods: {
+                        handleincrease: function () {
+                            this.count += 1000;
+                            this.$emit('change', this.count);//$emit触发事件传参count数据
+                        },
+                        handlereduce: function () {
+                            this.count -= 1000;
+                            this.$emit('change', this.count);
+                        }
+                    }
+
+                },
             },
             data: {         //双向绑定数据
                 msg: 'Vue组件',
                 bindmsg: 'Vue组件的局部组件',
                 count: 0,
-                width:200,
+                width: 200,
+                total: 0,
             },
             computed: {
 
@@ -58,6 +109,9 @@
             methods: {
                 puls: function () {
                     this.count += 1
+                },
+                handleTotal: function (value) {
+                    this.total = value
                 }
             }
         })
