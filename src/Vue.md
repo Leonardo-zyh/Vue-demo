@@ -70,12 +70,13 @@ vue实例中用 到的`所有方法都定义在methods中`
 #计算属性  -  computed对象
 所有的计算属性都以函数的形式写在 Vue 实例内的computed 选项内，最终返回计算后的结果。
 `只要其中任一数据变化，计算属性就会重新执行，视图也会更新`
+`模板内的表达式实际上只用于简单的运算，对于复杂逻辑，使用计算属性。`
 computed对象有get和set方法，如果直接跟function，使用getter函数
 计算属性可以依赖其他计算属性。
 计算属性不仅可以依赖当前 Vue 实例的数据，还可以依赖其他实例的数据
 
 #计算属性缓存   依赖属性变化才会重新计算
-调用 methods 里的方法也可以与计算属性起到同样的作用
+`调用 methods 里的方法也可以与计算属性起到同样的作用`
 页面中的方法： 如果是调用方法，只要页面重新渲染。方法就会重新执行，不需要渲染，则不需要重新执行
 计算属性：不管渲染不渲染，只要计算属性依赖的数据未发生变化，就永远不变
 
@@ -85,26 +86,55 @@ computed对象有get和set方法，如果直接跟function，使用getter函数
 就不更新
 何时使用:使用计算属性还是 methods 取决于你是否需要缓存，当遍历大数组和做大量计算时，应当使用计算属性。
 
+#案例：https://jsfiddle.net/50wL7mdz/412206/
+
+
+
 
 #v­-bind的复习
 动态更新HTML元素上的属性，比如 id 、class 等，数据变化时页面绑定就会变化。
 
-#绑定class
-v­bind:class 设置一个对象，可以动态地切换 class 
-     :class="{divstyle:isActive}    (isActive值对应true ,false)
-当 class 的表达式过长或逻辑复杂时，还可以绑定一个计算属性
 
-#绑定style
+#绑定 class 的几种方式
+
+#变量语法
+`v-bind：class = "变量"，变量形式 ,这里的变量的值，通常是在css定义好的类名；`
+     v-bind:href="www.baidu.com"
+
+#对象语法
+`v-­bind:class 设置一个对象，可以动态地切换 class `
+     :class="{divstyle:isActive}    (isActive值对应true ,false)
+    当 class 的表达式过长或逻辑复杂时，还可以绑定一个计算属性
+
+#数组语法
+`当需要应用多个 class 时， 可以使用数组语法` ， 
+     v-bind：class= "[变量1，变量2]" 
+
+
+
+#绑定内联样式   (用 v­bind:style)
 vue中只要是大写字母，就会转化为-加小写。(A -a)
 注意 : css属性名称使用驼峰命名(came!Case) 或短横分隔命名(kebab­case)
+:style="{'color':color,'font-size':fontSize+'px'}"
 
-:style{'color':color,'font-size':fontSize+'px'}
+* 应用多个样式对象时 ， 可以使用数组语法 ：在实际业务 中,style 的数组语法并不常用 ， 
+    因为往往可以写在一个对象里面 ： 而较为常用 的应当是计算属性
+* 使用 :style 时， Vue .js 会自动给特殊的 css 属性名称增加前缀， 比如 transform 。
+* 无需再加前缀属性！！！！
+
 
 #监听器  -  watch
 监听数据发送变化，进行函数逻辑
 
-
-
+#案例：https://jsfiddle.net/50wL7mdz/412252/
+~~~
+watch: {
+		firstName: function(current) {
+				this.firstName = current
+				this.fullName = this.firstName + this.lastName
+		},
+	}
+~~~
 
 
 
@@ -372,7 +402,7 @@ components:{'todo-item':{template:'<li>item</li>'}
 
 
 
-# 在组件中使用v­model
+# 在组件中使用v­-model
 `v-model可以代替父组件的监听，$emit触发input事件。`
 $emit的代码,这行代码实际上会触发一个 input事件, ‘input’后的参数就是传递给v­-model绑定的属性的值
 
@@ -484,3 +514,9 @@ VUE给我们提供 了一个元素叫component
 * 作用是： 用来动态的挂载不同的组件
 * 实现：使用is特性来进行实现
 `<component :is="thisVuew"></component>`
+
+
+
+# 自定义指令
+自定义指令的基本用法
+和组件类似分全局注册和局部注册，区别就是把component换成了derectiv
