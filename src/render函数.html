@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>render函数</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17-beta.0/vue.min.js"></script>
+    <style>
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <child value='666'></child>
+        {{msg}}
+        <my-component :show="show">
+            <p>ppppp</p>
+            <h3 slot="header">header</h3>
+            <h5 slot="footer">footer</h5>
+        </my-component>
+        <button @click="swichShow">点击切换</button>{{show}}
+    </div>
+
+
+    <script>
+
+        Vue.component('my-component',{
+            props:['show'],
+          render:function(createElement){           //render函数是一个方法可以写就是代码
+            let header = this.$slots.header         //这返回的内容就是含有=VNODE的数组
+            let footer = this.$slots.footer
+            return createElement('div',[
+                createElement('header',header),
+                createElement('footer',footer)
+                
+
+            ])
+          }
+        })
+
+
+
+
+
+        Vue.component('child',{     //第一个参数是子组件名
+        //String -- 是html标签
+        //Object -- 是含有数据选项的对象
+        //Function -- 是返回含有数据选项的对象
+            functional:true,
+            render :function(createElement,context){                   
+                return createElement('div'
+                //{template:'<div>锄禾日当午</div>'}
+                ,
+                {
+                    props:['value'] ,
+                    class:{
+                        foo:1,
+                        false:1,
+                    },
+                    style:{
+                        color:'red',                        
+                    },
+                    attrs:{ //html属性
+                        id:'foo',
+                        src:'www.baidu.com'
+                    },
+                    domProps:{  //原生的DOM属性
+                        //innerHTML:'<span>Hollow</span>'
+                    },
+                    on:{
+                        click:function(){
+                            
+                            
+                            console.log(context.props.value);
+                            
+                        }
+                    }
+                },
+                [
+                    createElement('h1','构建函数的子节点'),
+                    '构建函数的子节点'
+                ]
+                
+                )  
+                return createElement({
+                    template:'<div>锄禾日当午</div>'
+                })   
+            }
+        })
+
+        
+
+        var app = new Vue({
+            el: '#app',     //实例挂载DOM中
+            data: {         //双向绑定数据
+                msg:'点我变色',
+                show:true,
+                
+            },
+            computed: {
+
+            },
+            methods: {
+                swichShow:function(){
+                    this.show = !this.show
+                }
+            }
+        })
+
+
+
+    </script>
+</body>
+
+</html>

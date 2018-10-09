@@ -34,8 +34,8 @@ app.$el     app.$date
 app.msg
 
 #生命周期(钩子)
-created:()=>{alert('创建完成，还未挂载')},
-mounted:()=>{alert('已经挂载马上渲染')}
+created:function(){alert('创建完成，还未挂载')},
+mounted:function(){alert('已经挂载马上渲染')}
 
 #文本插值   {{msg}}    v-text/v-html
 `Vue .js 只支持单行表达式，不支持语句和流控制`
@@ -112,7 +112,7 @@ computed对象有get和set方法，如果直接跟function，使用getter函数
 
 
 
-#绑定内联样式   (用 v­bind:style)
+#绑定内联样式   (用 v-­bind:style)
 vue中只要是大写字母，就会转化为-加小写。(A -a)
 注意 : css属性名称使用驼峰命名(came!Case) 或短横分隔命名(kebab­case)
 :style="{'color':color,'font-size':fontSize+'px'}"
@@ -140,8 +140,8 @@ watch: {
 
 
 `内置命令`
-#v-­cloak             一般与display：none进行结合使用
-#v-once              定义它的元素和组件只渲染一次
+#v-­cloak             一般与display：none进行结合使用。防止闪烁
+#v-once              定义它的元素和组件只渲染一次，不再进行渲染
 
 `条件渲染指令`
 #v-­if, v­-eles-­if ,v­-else    用法： 必须跟着屁股走
@@ -152,14 +152,20 @@ watch: {
 v-if="show"         实时渲染：页面显示就渲染，不显示就移除
 v-show="show"       元素永远存在页面中，只改变了css属性display，
 
-
+#v-if 与 v-for 一起使用
+当 v-if 与 v-for 一起使用时，v-for 具有比 v-if 更高的优先级。
 
 #v-for              当需要将一个数组遍历或枚举一个对象属性的时候循环显示(列表)
-遍历多个对象
-遍历一个对象的多个属性
+遍历多个对象,遍历一个对象的多个属性
+可以用 of 替代 in 作为分隔符，JavaScript 迭代器的语法
 `v-for="vueMth in list" `
 `v-for="(item,index) of lest" :key="index"`
 
+#key
+当 Vue.js 用 v-for 正在更新已渲染过的元素列表时，它默认用“就地复用”策略。
+数据项的顺序被改变，Vue 将不会移动 DOM 元素来匹配数据项的顺序
+`不依赖子组件状态或临时 DOM 状态 (例如：表单输入值) 的列表渲染输出。`
+给 Vue 一个提示，以便它能跟踪每个节点的身份,需要为每项提供一个唯一 key 属性。
 
 #数组更新，过滤与排序
 • push()            在末尾添加元素
@@ -240,6 +246,7 @@ triz        trim自动过滤输入过程中收尾输入的空格
 #Vue组件   (每一个组件都是Vue的实例)
 #使用组件的原因
 作用：提高代码的复用性
+组件名就是 Vue.component 的第一个参数
 
 #全局注册
 Vue.component('todo-item',{templet:'<li>item</li>'})
@@ -279,7 +286,8 @@ components:{'todo-item':{template:'<li>item</li>'}
     <todo-item content="Vue的组件"></todo-item>
 
     Vue.component('todo-item',{
-        props:['content']
+        props:['title', 'likes', 'isPublished', 'commentIds', 'author']
+        //props: {title: String,likes: Number,isPublished: Boolean,commentIds: Array,author: Object}
         templet:'<li>{{content}}</li>'})
 ~~~
 
@@ -457,7 +465,8 @@ message 应该绑定到父组件的数据，还是绑定到子组件的数据？
 
 #插槽的用法
 父组件的内容与子组件相混合，从而弥补了视图的不足
-混合父组件的内容与子组件自己的模板
+混合父组件的内容与子组件自己的模板。
+组件物内容可显示slot内容
 * 单个插槽：
     <div id="app" >
         <my-component>
@@ -520,3 +529,54 @@ VUE给我们提供 了一个元素叫component
 # 自定义指令
 自定义指令的基本用法
 和组件类似分全局注册和局部注册，区别就是把component换成了derectiv
+
+
+
+## render函数初步了解
+不使用render函数，template下只允许有一个子节点
+
+
+#render函数的第一个参数
+在render函数的方法中，`第一个参数必须是createElement`,createElement的类型是function。
+render函数的第一个参数可以是 String | Object | Function
+
+#render函数的第二个参数
+第二个参数可选,`第二个参数是数据对象----只能是Object`
+可以写入 类、内联样式、html属性、原生的DOM属性
+
+#render函数的第三个参数
+`第三个参数也是可选===String | Array`
+作为我们构建函数的子节点来使用 的
+
+
+# this.$slots在render函数中的应用
+`第三个 参数存的就是VNODE`
+createElement(‘header’,header), 返回的就是VNODE
+var header = this.$slots.header; //–这返回的内容就是含有=VNODE的数组
+
+
+# 在render函数中使用props传递数据
+:show="show"
+props:['show'],
+
+# v­-model在render函数中的使用
+接受从子组件传递的数据，赋值给绑定的变量
+var a = this;
+//此处的this指的是什么？指的就是window
+self.$emit('input',event.target.value)
+
+
+#作用域插槽在render函数中的使用
+<template scope="prop">
+{{prop.text}}
+</template>
+相当于  <div><slot :text="text"></slot> </div>
+
+
+# 函数化组件的应用
+使用context的转变,得到上下文对象
+`functional: true,表示该组件无状态无实例`
+`render :function(createElement,context)`
+`console.log(context.props.value);`
+* this.text   -               context.props.text
+* this.$slots.default -       context.children
