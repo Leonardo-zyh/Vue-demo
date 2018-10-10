@@ -125,3 +125,7 @@ axios 是一个基于Promise 用于浏览器和 nodejs 的 HTTP 客户端，它�
 取消请求
 自动转换JSON数据
 客户端支持防止 CSRF/XSRF
+
+
+#子父级传递数据
+绑定和props，触发监听
