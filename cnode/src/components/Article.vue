@@ -60,7 +60,7 @@ export default {
     };
   },
   methods: {
-    getArticle() {
+    getArticleData() {
       this.$http
         .get(`https://cnodejs.org/api/v1/topic/${this.$route.params.id}`)
         .then(res => {
@@ -77,7 +77,12 @@ export default {
   },
   beforeMount: function() {
     this.isLoading = true; //加载成功之前显示加载动画
-    this.getArticle(); //页面加载前获取数据
+    this.getArticleData(); //页面加载前获取数据
+  },
+    watch:{
+      '$route'(to,from){
+          this.getArticleData()
+      }
   }
 };
 </script>
