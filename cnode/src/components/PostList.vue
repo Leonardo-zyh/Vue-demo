@@ -17,7 +17,14 @@
             </li>
               <li v-for="(post,index) in posts" :key="index">
                 <!-- 头像 -->
-                <img :src="post.author.avatar_url" alt="">
+                <router-link :to="{
+                    name:'user_info',
+                    params:{
+                        name:post.author.loginname
+                    }
+                }">
+                    <img :src="post.author.avatar_url" alt="">
+                </router-link>
                 <!-- 浏览量 -->
                 <span class="count">
                   <span class="reply_count">{{post.reply_count}}</span>
@@ -33,7 +40,8 @@
                 <router-link :to="{
                   name:'post_content',
                   params:{
-                    id:post.id
+                    id:post.id,
+                    name:post.author.loginname
                   }}">
                 <span class="title">
                   {{post.title}}
